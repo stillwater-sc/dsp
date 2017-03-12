@@ -9,9 +9,13 @@ import (
 )
 
 func main() {
-	kpu := gokl.Initialize()
+	// Initialize creates a new resource manager
+	// Does the RM work on one, or more accelerators? Multiple: the RM is the big aggregator
+	// That implies that you need to get a specific KPU from the RM
+	rm := gokl.Initialize()
+	kpu := rm.GetRemote("KPU-0")
 	defer func() {
-		kpu.Release()
+		gokl.Shutdown()
 	}()
 
 	A := mat64.NewDense(5,5, CreateRandom(25))
@@ -25,7 +29,7 @@ func main() {
 	log.Printf("%s\n", PrettyPrintMatrix("C", &C))
 
 	// marshal the A and B matrices into the KPU fabric
-	kpu.Marshal(A)
+	rm.Marshal(A)
 }
 
 func CreateRandom(size int) []float64 {
