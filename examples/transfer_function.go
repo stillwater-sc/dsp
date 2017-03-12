@@ -9,9 +9,9 @@ import (
 )
 
 func main() {
-	accelerator := gokl.Initialize()
+	kpu := gokl.Initialize()
 	defer func() {
-		accelerator.Release()
+		kpu.Release()
 	}()
 
 	A := mat64.NewDense(5,5, CreateRandom(25))
@@ -23,6 +23,9 @@ func main() {
 	log.Printf("%s\n", PrettyPrintMatrix("A", A))
 	log.Printf("%s\n", PrettyPrintMatrix("B", B))
 	log.Printf("%s\n", PrettyPrintMatrix("C", &C))
+
+	// marshal the A and B matrices into the KPU fabric
+	kpu.Marshal(A)
 }
 
 func CreateRandom(size int) []float64 {
