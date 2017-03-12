@@ -8,12 +8,8 @@ import (
 )
 
 func main() {
-	a_values := make([]float64, 25)
-	b_values := make([]float64, 25)
-	for i := range a_values {
-		a_values[i] = rand.NormFloat64()
-		b_values[i] = rand.NormFloat64()
-	}
+	a_values := CreateRandom(25)
+	b_values := CreateRandom(25)
 	A := mat64.NewDense(5,5, a_values)
 	B := mat64.NewDense(5,5, b_values)
 
@@ -26,13 +22,21 @@ func main() {
 			c_values[i * cols + j] = C.At(i, j)
 		}
 	}
-	log.Printf("%s\n", PrettyPrintMatrix("A", 5,5, a_values))
-	log.Printf("%s\n", PrettyPrintMatrix("B", 5,5, b_values))
-	log.Printf("%s\n", PrettyPrintMatrix("C", 5,5, c_values))
+	log.Printf("%s\n", PrettyPrintMatrix("A", A))
+	log.Printf("%s\n", PrettyPrintMatrix("B", B))
+	log.Printf("%s\n", PrettyPrintMatrix("C", &C))
 }
 
-func PrettyPrintMatrix(name string, rows, cols int, data []float64) string {
-	stride := cols
+func CreateRandom(size int) []float64 {
+	values := make([]float64, size)
+	for i := range values {
+		values[i] = rand.NormFloat64()
+	}
+	return values
+}
+
+func PrettyPrintMatrix(name string, matrix *mat64.Dense) string {
+	rows, cols := matrix.Dims()
 	// create header
 	var str string = fmt.Sprintf("\n%10s", name)
 	for j := 0; j < rows; j++ {
@@ -42,7 +46,7 @@ func PrettyPrintMatrix(name string, rows, cols int, data []float64) string {
 	for i := 0; i < rows; i++ {
 		str = str + fmt.Sprintf("%10d ", i)
 		for j := 0; j < cols; j++ {
-			str = str + fmt.Sprintf("%10.6f ", data[i*stride + j])
+			str = str + fmt.Sprintf("%10.6f ", matrix.At(i,j))
 		}
 		str = str + "\n"
 	}
