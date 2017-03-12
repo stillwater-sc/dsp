@@ -5,23 +5,21 @@ import (
 	"github.com/gonum/matrix/mat64"
 	"fmt"
 	"log"
+	"github.com/stillwater-sc/gokl"
 )
 
 func main() {
-	a_values := CreateRandom(25)
-	b_values := CreateRandom(25)
-	A := mat64.NewDense(5,5, a_values)
-	B := mat64.NewDense(5,5, b_values)
+	accelerator := gokl.Initialize()
+	defer func() {
+		accelerator.Release()
+	}()
+
+	A := mat64.NewDense(5,5, CreateRandom(25))
+	B := mat64.NewDense(5,5, CreateRandom(25))
 
 	var C mat64.Dense
 	C.Mul(A,B)
-	rows, cols := C.Dims()
-	c_values := make([]float64, 25)
-	for i := 0; i < rows; i++ {
-		for j := 0; j < cols; j++ {
-			c_values[i * cols + j] = C.At(i, j)
-		}
-	}
+
 	log.Printf("%s\n", PrettyPrintMatrix("A", A))
 	log.Printf("%s\n", PrettyPrintMatrix("B", B))
 	log.Printf("%s\n", PrettyPrintMatrix("C", &C))
